@@ -1,5 +1,5 @@
 # smokeping
 SmokePing keeps track of your network latency with Interactive graph explorer. 
-For installation procedure refer the file installation in this repository.
+For installation procedure refer the file "installation" in this repository.
 The asumption is you are familiar with basic linux terminal commands, therefore I will not explain what they do.
-Sample configuration file for measuring latency and dig (domain information groper) for DNS servers around the world check the file repo 
+Sample configuration file for measuring latency and dig (domain information groper) for DNS servers around the world check the file repo for "config" 
