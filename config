@@ -593,6 +593,7 @@ title = simbanet
 host = 41.221.41.101
 
 ++ MultiHost
+# using the hosts above to create a multi host graph for google and open DNS
 menu = MultiHost
 title = Overall DNS Performance
 host = /PublicDNS/google\
