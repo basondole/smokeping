@@ -1,0 +1,16 @@
+# The router.db file is specific for each group and located in the group directory.
+# Add devices to the group by editing the /var/lib/rancid/core/router.db and /var/lib/rancid/access/router.db
+
+rancid@plasma:~$ nano /var/lib/rancid/core/router.db
+# add your devices in the below format
+hostname1:cisco:up
+192.168.56.36:juniper:up
+# save and exit
+
+# The hostnames however must be defined in the etc/hosts file.
+# To add a host name, hostname1, with an IP address 192.168.56.57 for example, edit the /etc/hosts and add
+
+rancid@plasma:~$ nano /etc/hosts
+# add the hostname and its ip
+192.168.56.57 hostname1
+# save and exit
