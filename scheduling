@@ -1,0 +1,7 @@
+# In order for RANCID to keep track of changes you have to schedule a cronjob with will run as the rancid user.
+
+rancid@plasma:~$ crontab -e
+0 * * * * * /usr/bin/rancid-run
+
+# this will schedule a run each hour and notify the members of the respective group each time any of the devices change.
+# you can of course set it to run how often you like.
