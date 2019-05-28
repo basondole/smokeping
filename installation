@@ -1,14 +1,17 @@
-[baggy@localhost setup]$sudo yum install epel-release -y
-[baggy@localhost setup]$sudo yum install mod_fcgid httpd httpd-devel rrdtool perl-CGI-SpeedyCGI fping rrdtool-perl perl perl-Sys-Syslog -y
-[baggy@localhost setup]$sudo yum install perl-CPAN perl-local-lib perl-Time-HiRes –y
-[baggy@localhost setup]$sudo yum groupinstall "Development tools" –y
+This is for CentOS7
 
-[baggy@localhost setup]$sudo wget http://oss.oetiker.ch/smokeping/pub/smokeping-2.6.11.tar.gz
-[baggy@localhost setup]$tar -zxvf smokeping-2.6.11.tar.gz
-[baggy@localhost setup]$cd smokeping-2.6.11/setup
+[baggy@localhost ~]$sudo yum install epel-release -y
+[baggy@localhost ~]$$sudo yum install mod_fcgid httpd httpd-devel rrdtool perl-CGI-SpeedyCGI fping rrdtool-perl perl perl-Sys-Syslog -y
+[baggy@localhost ~]$sudo yum install perl-CPAN perl-local-lib perl-Time-HiRes –y
+[baggy@localhost ~]$$sudo yum groupinstall "Development tools" –y
+
+[baggy@localhost ~]$sudo wget http://oss.oetiker.ch/smokeping/pub/smokeping-2.6.11.tar.gz
+[baggy@localhost ~]$tar -zxvf smokeping-2.6.11.tar.gz
+[baggy@localhost ~]$cd smokeping-2.6.11/setup
+
 [baggy@localhost setup]$sudo ./build-perl-modules.sh
 [baggy@localhost setup]$sudo mkdir /opt/smokeping
-[baggy@localhost setup]$ cd ..
+[baggy@localhost setup]$cd ..
 
 [baggy@localhost smokeping-2.6.11]$ sudo cp -r thirdparty /opt/smokeping/
 [baggy@localhost smokeping-2.6.11]$ ./configure --prefix=/opt/smokeping
@@ -52,7 +55,7 @@ Add the below lines to the file and save:
     </Directory>
 
 [baggy@localhost etc]$ sudo nano /opt/smokeping/etc/config
-Find and edit the line starting with cgiurl, 192.168.56.4 is my host ip:
+Find and edit the line starting with cgiurl and add your ip address, 192.168.56.4 is my host ip that I added:
 
     cgiurl   = http://192.168.56.4/smokeping.cgi
 
