@@ -1,9 +1,5 @@
-This is for CentOS7
+# This is for CentOS7
 
-[baggy@localhost ~]$sudo nano /etc/selinux/config
-#Edit the line to
-   SELINUX=disabled
-   
 [baggy@localhost ~]$sudo yum install epel-release -y
 [baggy@localhost ~]$sudo yum install mod_fcgid httpd httpd-devel rrdtool perl-CGI-SpeedyCGI fping rrdtool-perl perl perl-Sys-Syslog -y
 [baggy@localhost ~]$sudo yum install perl-CPAN perl-local-lib perl-Time-HiRes –y
@@ -37,15 +33,6 @@ This is for CentOS7
 [baggy@localhost etc]$ sudo mv /var/www/smokeping/smokeping.fcgi.dist /var/www/smokeping/smokeping.fcgi
 [baggy@localhost etc]$ sudo chown -R apache:apache /var/www/smokeping
 
-
---- Do not use the below commands unless you know what you are doing
-[baggy@localhost etc]$ sudo ln -s /opt/smokeping/htdocs/ /var/www/html/smokeping
-[baggy@localhost etc]$ sudo ln -s /opt/smokeping/img/ /var/www/html/smokeping
-[baggy@localhost etc]$ sudo ln -s /opt/smokeping/cache/ /var/www/html/smokeping
-[baggy@localhost etc]$ sudo chown -R apache:apache /var/www/html/smokeping/
---- End of warning
-
-
 [baggy@localhost etc]$ sudo nano /etc/httpd/conf.d/smokeping.conf
 Add the below lines to the file and save:
 
@@ -63,6 +50,12 @@ Find and edit the line starting with cgiurl and add your ip address, 192.168.56.
 
     cgiurl   = http://192.168.56.4/smokeping.cgi
 
+[baggy@localhost etc] sudo nano /etc/selinux/config
+Edit the SELINUX line to be disabled like below
+
+   SELINUX=disabled
+   
+[baggy@localhost etc]$ firewall-cmd --add-service=http
 
 [baggy@localhost etc]$ sudo service httpd restart
 
