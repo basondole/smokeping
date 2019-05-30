@@ -1,9 +1,9 @@
 This is for CentOS7
 
 [baggy@localhost ~]$sudo yum install epel-release -y
-[baggy@localhost ~]$$sudo yum install mod_fcgid httpd httpd-devel rrdtool perl-CGI-SpeedyCGI fping rrdtool-perl perl perl-Sys-Syslog -y
+[baggy@localhost ~]$sudo yum install mod_fcgid httpd httpd-devel rrdtool perl-CGI-SpeedyCGI fping rrdtool-perl perl perl-Sys-Syslog -y
 [baggy@localhost ~]$sudo yum install perl-CPAN perl-local-lib perl-Time-HiRes –y
-[baggy@localhost ~]$$sudo yum groupinstall "Development tools" –y
+[baggy@localhost ~]$sudo yum groupinstall "Development tools" –y
 
 [baggy@localhost ~]$sudo wget http://oss.oetiker.ch/smokeping/pub/smokeping-2.6.11.tar.gz
 [baggy@localhost ~]$tar -zxvf smokeping-2.6.11.tar.gz
