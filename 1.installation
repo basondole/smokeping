@@ -5,6 +5,6 @@ baggy@plasma:~$ sudo apt-get install postfix -y
 baggy@plasma:~$ sudo apt-get install rancid -y
 
 # You will be presented with an informational text which says it is an early release of the package. It is however functional.
-# The install will create a rancid user without a password. You will have to create a paasword for this user
+# The install will create a rancid user without a password. You will have to create a password for this user
 
 baggy@plasma:~$ sudo passwd rancid
