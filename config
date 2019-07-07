@@ -1,4 +1,3 @@
-[baggy@localhost ~]$ cat /opt/smokeping/etc/config
 *** General ***
 
 owner    = Paul S.I. Basondole
@@ -598,5 +597,5 @@ menu = MultiHost
 title = Overall DNS Performance
 host = /PublicDNS/google\
 /PublicDNS/opendns
-[baggy@localhost ~]$
+
 
