@@ -59,3 +59,8 @@ SELINUX=disabled
 **[baggy@localhost etc]$** sudo service httpd restart
 
 Use web browser to open http\://192.168.56.4/smokeping.cgi
+
+#### Note: If you experience broken images on the web interface edit the config file as described below  
+**[baggy@localhost etc]$** sudo nano  /opt/smokeping/etc/config  
+*Edit the imgurl value from cache to /smokeping*  
+```imgurl   = /smokeping```
