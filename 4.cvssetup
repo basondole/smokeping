@@ -1,9 +1,0 @@
-# By default RANCID uses CVS to keep track of changes to your devices
-# to prepare the CVS database you have to run the command rancid-cvs as the rancid user.
-# this needs to be done each time you add a new group to the /etc/rancid/rancid.conf
-
-baggy@plasma:~$ sudo -i -u rancid /var/lib/rancid/bin/rancid-cvs
-
-# this will create a directory for each group in /var/lib/rancid
-# so the core group will be located in the /var/lib/rancid/core directory.
-# and the access group will be located in the /var/lib/rancid/access directory.
