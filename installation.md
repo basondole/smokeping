@@ -8,32 +8,35 @@
     tar -zxvf smokeping-2.6.11.tar.gz  
     cd smokeping-2.6.11/setup  
 
-**[baggy@localhost setup]$** sudo ./build-perl-modules.sh  
-**[baggy@localhost setup]$** sudo mkdir /opt/smokeping  
-**[baggy@localhost setup]$** cd ..  
+**[baggy@localhost setup]$**  
+    sudo ./build-perl-modules.sh  
+    sudo mkdir /opt/smokeping  
+    cd ..  
 
-**[baggy@localhost smokeping-2.6.11]$** sudo cp -r thirdparty /opt/smokeping/  
-**[baggy@localhost smokeping-2.6.11]$** ./configure --prefix=/opt/smokeping  
-**[baggy@localhost smokeping-2.6.11]$** sudo /usr/bin/gmake install  
-**[baggy@localhost smokeping-2.6.11]$** cd /opt/smokeping/etc/  
+**[baggy@localhost smokeping-2.6.11]$**  
+    sudo cp -r thirdparty /opt/smokeping/  
+    ./configure --prefix=/opt/smokeping  
+    sudo /usr/bin/gmake install  
+    cd /opt/smokeping/etc/  
 
-**[baggy@localhost etc]$** sudo cp /opt/smokeping/etc/basepage.html.dist /opt/smokeping/etc/basepage.html  
-**[baggy@localhost etc]$** for FOO in \*.dist; do sudo cp \$FOO \`basename \$FOO .dist\`\;done  
-**[baggy@localhost etc]$** sudo mkdir /opt/smokeping/img  
-**[baggy@localhost etc]$** sudo mkdir /opt/smokeping/data  
-**[baggy@localhost etc]$** sudo mkdir /opt/smokeping/var  
-**[baggy@localhost etc]$** sudo mkdir /opt/smokeping/cache  
-**[baggy@localhost etc]$** sudo chown -R apache:apache /opt/smokeping/img/  
-**[baggy@localhost etc]$** sudo chown -R apache:apache /opt/smokeping/cache/  
-**[baggy@localhost etc]$** sudo chmod 600 /opt/smokeping/etc/smokeping_secrets  
-**[baggy@localhost etc]$** sudo chmod 600 /opt/smokeping/etc/smokeping_secrets.dist  
-**[baggy@localhost etc]$** sudo mkdir /var/www/smokeping  
-**[baggy@localhost etc]$** sudo cp -R /opt/smokeping/htdocs/\* /var/www/smokeping/  
-**[baggy@localhost etc]$** sudo mv /var/www/smokeping/smokeping.fcgi.dist /var/www/smokeping/smokeping.fcgi  
-**[baggy@localhost etc]$** sudo chown -R apache:apache /var/www/smokeping  
-
-**[baggy@localhost etc]$** sudo nano /etc/httpd/conf.d/smokeping.conf  
-*Add the below lines to the file and save:*
+**[baggy@localhost etc]$**  
+    sudo cp /opt/smokeping/etc/basepage.html.dist /opt/smokeping/etc/basepage.html  
+    for FOO in \*.dist; do sudo cp \$FOO \`basename \$FOO .dist\`\;done  
+    sudo mkdir /opt/smokeping/img  
+    sudo mkdir /opt/smokeping/data  
+    sudo mkdir /opt/smokeping/var  
+    sudo mkdir /opt/smokeping/cache  
+    sudo chown -R apache:apache /opt/smokeping/img/  
+    sudo chown -R apache:apache /opt/smokeping/cache/  
+    sudo chmod 600 /opt/smokeping/etc/smokeping_secrets  
+    sudo chmod 600 /opt/smokeping/etc/smokeping_secrets.dist  
+    sudo mkdir /var/www/smokeping  
+    sudo cp -R /opt/smokeping/htdocs/\* /var/www/smokeping/  
+    sudo mv /var/www/smokeping/smokeping.fcgi.dist /var/www/smokeping/smokeping.fcgi  
+    sudo chown -R apache:apache /var/www/smokeping  
+    sudo nano /etc/httpd/conf.d/smokeping.conf 
+    
+   *Add the below lines to the file and save:*
 ```
     Alias /smokeping "/var/www/smokeping"
     <Directory /var/www/smokeping>
@@ -44,23 +47,27 @@
     DirectoryIndex smokeping.fcgi
     </Directory>
 ```
-**[baggy@localhost etc]$** sudo nano /opt/smokeping/etc/config  
-*Find and edit the line starting with cgiurl and add your ip address, 192.168.56.4 is my host ip that I added:*
+**[baggy@localhost etc]$**  
+    sudo nano /opt/smokeping/etc/config  
+    *Find and edit the line starting with cgiurl and add your ip address, for my case my IP is 192.168.56.4 and save*
 ```
-cgiurl   = http://192.168.56.4/smokeping.cgi
+    cgiurl   = http://192.168.56.4/smokeping.cgi
 ```
-**[baggy@localhost etc]** sudo nano /etc/selinux/config  
-*Edit the SELINUX line to be disabled like below*
-```
-SELINUX=disabled
-```
-**[baggy@localhost etc]$** firewall-cmd --add-service=http
 
-**[baggy@localhost etc]$** sudo service httpd restart
+**[baggy@localhost etc]**  
+    sudo nano /etc/selinux/config  
+    *Edit the SELINUX line to be disabled like below*
+```
+    SELINUX=disabled
+```
+**[baggy@localhost etc]$**  
+    firewall-cmd --add-service=http  
+    sudo service httpd restart
 
 Use web browser to open http\://192.168.56.4/smokeping.cgi
 
-#### Note: If you experience broken images on the web interface edit the config file as described below  
+# Troubleshooting  
+#### If you experience broken images on the web interface edit the config file as described below  
 **[baggy@localhost etc]$** sudo nano  /opt/smokeping/etc/config  
 *Edit the imgurl value from cache to /smokeping*  
 ```imgurl   = /smokeping```
