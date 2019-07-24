@@ -1,5 +1,5 @@
 # smokeping
-SmokePing keeps track of your network latency with Interactive graph explorer learn more at https://oss.oetiker.ch/smokeping/.  
+SmokePing keeps track of your network latency with Interactive graph explorer. Learn more at https://oss.oetiker.ch/smokeping/.  
 This repo provides basic instruction on installation and setting up smokeping server.
 
 ## Installation
