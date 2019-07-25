@@ -1,4 +1,4 @@
-# Installation for CentOS 7
+# Installation on CentOS 7
 **[baggy@localhost ~]$**  
     sudo yum install epel-release -y  
     sudo yum install mod_fcgid httpd httpd-devel rrdtool perl-CGI-SpeedyCGI fping rrdtool-perl perl perl-Sys-Syslog -y  
