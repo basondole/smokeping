@@ -70,5 +70,16 @@ Below is an example of `vagrantfile` that creates the shown topology
 
 <img width="478" alt="vagrantfile" src="https://user-images.githubusercontent.com/50369643/61875466-594cc480-aef3-11e9-9de5-f4a2941bbf14.PNG">
 
-#### Testing the topology
+#### Testing the topology  
+Checking the vagrant status you will have now have two devices **r1** and **r2**  
 
+<img width="478" alt="vagranttopology" src="https://user-images.githubusercontent.com/50369643/61879021-d4fe3f80-aefa-11e9-864a-564a960895e0.PNG">
+
+Use command `vagrant up` to boot both VMs, to boot one of them for example booting **r2** only use command `vagrant up r2`  
+After the VMs boot up you can confirm their status by command `vagrant status`  and you can login and do your work on them.  
+
+<img width="635" alt="vagranttopology2" src="https://user-images.githubusercontent.com/50369643/61879619-0f1c1100-aefc-11e9-8871-14072dccec80.PNG">
+
+To shutdown the VMs use command `vagrant halt`
+
+<img width="547" alt="vagranthalt" src="https://user-images.githubusercontent.com/50369643/61879858-8651a500-aefc-11e9-9c61-504dd25ad4b1.PNG">
