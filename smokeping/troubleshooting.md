@@ -10,5 +10,5 @@
 - If you experience broken images on the web interface edit the config file as described below  
 
     **[baggy@localhost etc]$** sudo nano  /opt/smokeping/etc/config  
-    *Edit the imgurl value from cache to /smokeping*  
+    *Find and edit the imgurl value from cache to /smokeping*  
     ```imgurl   = /smokeping```
