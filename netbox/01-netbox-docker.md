@@ -117,3 +117,5 @@ WEBHOOKS_ENABLED=true
 basondole@netbox:~/netbox-docker$
 </pre>
 
+> Reference
+https://www.techrepublic.com/article/how-to-deploy-the-netbox-network-documentationmanagement-tool-with-docker/
