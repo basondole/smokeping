@@ -67,7 +67,7 @@ basondole@netbox:~/netbox-docker$
 
 ### How to access Netbox 
 <pre>
-basondole@netbox:~/netbox-docker$ echo "http://$(docker-compose port nginx 8080)/)/"
+basondole@netbox:~/netbox-docker$ echo "http://$(docker-compose port nginx 8080)/"
 http://0.0.0.0:32768/
 basondole@netbox:~/netbox-docker$
 </pre>
