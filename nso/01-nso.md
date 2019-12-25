@@ -57,8 +57,8 @@ basondole@netbox:~/nso$
 <pre>
 basondole@netbox:~/nso$ sh nso-5.1.0.1
 Unpacking...
-ERROR Verification requires Python version 2.7.4 or later.
-ERROR
+<b>ERROR Verification requires Python version 2.7.4 or later.
+ERROR</b>
 </pre>
 To overcome this do a python install then extrat the file again
 <pre>
@@ -148,7 +148,7 @@ basondole@netbox:~/ncs-run$ ncs_cli -u admin -C
 
 admin connected from 192.168.56.1 using ssh on netbox
 admin@ncs# show packages
-% No entries found.
+<b>% No entries found.</b>
 admin@ncs# packages reload
 
 >>> System upgrade is starting.
@@ -157,7 +157,7 @@ admin@ncs# packages reload
 >>> System upgrade has been cancelled.
 <b>Error: User java class "com.tailf.packages.ned.ios.UpgradeNedId" exited with status 127</b>
 admin@ncs# show packages
-% No entries found.
+<b>% No entries found.</b>
 admin@ncs# exit
 </pre>
 
@@ -201,7 +201,7 @@ cisco-ios-cli-3.0  cisco-iosxr-cli-3.0  cisco-nx-cli-3.0
 cisco-ios-cli-3.8  cisco-iosxr-cli-3.5  juniper-junos-nc-3.0
 </pre>
 
-Loggin to the ncs and reload the packages
+Login to the ncs and reload the packages
 <pre>
 basondole@netbox:~/ncs-run$ ncs_cli -u admin -C
 admin@ncs# packages reload
@@ -244,3 +244,76 @@ From above we see we had errors loading a couple of NEDs with `java unitialized`
 The issue here is very likely related to the JavaVM, since all the Java packages are failing,
 while the Junos NETCONF NED (which doesn't use any Java) is fine.
 Since we have quite a few NEDs, the issue is almost certainly that the JavaVM is out of memory/heap space.
+
+To check the java-vm log on ncs   `basondole@netbox:~/ncs-run$ less logs/ncs-java-vm.log`
+
+To fix the memory problem in my case since my server has 2GB of RAM, I assigned 1GB of memory to java.  
+`basondole@netbox:~/ncs-run$ export NCS_JAVA_VM_OPTIONS=-Xmx1G`  
+You can add this to your `.bash_profile` so that it is done automatically everytime you log in 
+
+We then relaunch the ncs
+<pre>
+basondole@netbox:~/ncs-run$ ncs --stop
+basondole@netbox:~/ncs-run$ ncs_cli -c admin -C
+
+basondole connected from 192.168.56.1 using ssh on netbox
+
+basondole@ncs# packages reload
+
+>>> System upgrade is starting.
+>>> Sessions in configure mode must exit to operational mode.
+>>> No configuration changes can be performed until upgrade has completed.
+>>> System upgrade has completed successfully.
+reload-result {
+    package cisco-iosxr-cli-3.0
+    <b>result true</b>
+}
+reload-result {
+    package cisco-iosxr-cli-3.5
+    <b>result true</b>
+}
+reload-result {
+    package juniper-junos-nc-3.0
+    <b>result true</b>
+}
+basondole@ncs#
+basondole@ncs# show packages package oper-status
+                                                                                         PACKAGE
+                          PROGRAM                                                        META     FILE
+                          CODE     JAVA           BAD NCS  PACKAGE  PACKAGE  CIRCULAR    DATA     LOAD   ERROR
+NAME                  UP  ERROR    UNINITIALIZED  VERSION  NAME     VERSION  DEPENDENCY  ERROR    ERROR  INFO
+----------------------------------------------------------------------------------------------------------------
+cisco-iosxr-cli-3.0   X   -        -              -        -        -        -           -        -      -
+cisco-iosxr-cli-3.5   X   -        -              -        -        -        -           -        -      -
+juniper-junos-nc-3.0  X   -        -              -        -        -        -           -        -      -
+
+basondole@ncs# exit
+basondole@netbox:~/ncs-run$
+</pre>
+
+## Adding the auth group to the ncs
+Before we can add devices in the ncs we have to define an authentication group
+
+<pre>
+admin@ncs# config
+admin@ncs(config)# devices authgroups group GROUP01
+admin@ncs(config-group-GROUP01)# default-map remote-name fisi
+admin@ncs(config-group-GROUP01)# default-map remote-password fisi123
+admin@ncs(config-group-GROUP01)# top
+admin@ncs(config)# commit check
+<b>Validation complete</b>
+admin@ncs(config)# show configuration diff
++devices authgroups group GROUP01
++ default-map remote-name fisi
++ default-map remote-password $8$1SgUsPkoEaFvTwK02flfv5Ta5ut9WBf+I1m+OaTo8vQ=
++!
+admin@ncs(config)# commit
+<b>Commit complete.</b>
+
+admin@ncs(config)# do show configuration commit list
+2019-12-24 13:53:45
+SNo. ID       User       Client      Time Stamp          Label       Comment
+~~~~ ~~       ~~~~       ~~~~~~      ~~~~~~~~~~          ~~~~~       ~~~~~~~
+1000 10002    admin      cli         2019-12-24 13:51:41
+1000 10001    system     system      2019-11-13 13:42:45
+</pre>
