@@ -326,7 +326,8 @@ SNo. ID       User       Client      Time Stamp          Label       Comment
 
 
 ## Configuring devices for nso
-> configuration is pulled from devices I used on my presentation on Pycon Tanzania excuse pycon for hostname
+> Configuration is pulled from devices I used on my presentation at Pycon Tanzania Dec 2019 excuse th use of pycon for hostnames  
+
 Cisco IOS XR
 <pre>
 RP/0/0/CPU0:pycon-iosxr(config)#show configuration 
