@@ -111,10 +111,136 @@ basondole@netbox:~/ncs-run$
 To enable pasting of multiple lines of text in the ncs cli add below lines in the ncs config file
 
 `basondole@netbox:~/ncs-run$ nano ncs.conf`
-<pre>
+```
 <enabled>true</enabled>
 <space-completion><enabled>false</enabled></space-completion>
 <ignore-leading-whitespace>true</ignore-leading-whitespace>
 <auto-wizard><enabled>false</enabled></auto-wizard>
+```
+
+To offer support for a range of multivendor devices, NSO uses Network Element Drivers (NEDs).
+Using NEDs, NSO makes device configuration commands available over a network wide, multivendor Command Line Interface (CLI), APIs, and user interface  
+Learn more at https://www.cisco.com/c/en/us/products/collateral/cloud-systems-management/network-services-orchestrator/datasheet-c78-734669.html
+
+To verify the pre installed NEDs on your system
+<pre>
+basondole@netbox:~/ncs-run$ cd $NCS_DIR
+basondole@netbox:~/nso-5.1.0.1$ ls packages/
+lsa  neds  services  tools
+basondole@netbox:~/nso-5.1.0.1$ ls packages/neds/
+a10-acos-cli-3.0  cisco-ios-cli-3.0  cisco-iosxr-cli-3.0  cisco-nx-cli-3.0   juniper-junos-nc-3.0
+alu-sr-cli-3.4    cisco-ios-cli-3.8  cisco-iosxr-cli-3.5  dell-ftos-cli-3.0
+basondole@netbox:~/nso-5.1.0.1$
 </pre>
 
+To verif whether the packages are loaded in the ncs
+<pre>
+basondole@netbox:~/ncs-run$ ncs_cli -u admin -C
+admin connected from 192.168.56.1 using ssh on netbox
+admin@ncs# show packages
+% No entries found.
+admin@ncs# exit
+</pre>
+
+If they are not loaded as seen above you can issue a reload command in the ncs
+<pre>
+basondole@netbox:~/ncs-run$ ncs_cli -u admin -C
+
+admin connected from 192.168.56.1 using ssh on netbox
+admin@ncs# show packages
+% No entries found.
+admin@ncs# packages reload
+
+>>> System upgrade is starting.
+>>> Sessions in configure mode must exit to operational mode.
+>>> No configuration changes can be performed until upgrade has completed.
+>>> System upgrade has been cancelled.
+<b>Error: User java class "com.tailf.packages.ned.ios.UpgradeNedId" exited with status 127</b>
+admin@ncs# show packages
+% No entries found.
+admin@ncs# exit
+</pre>
+
+If you run into this error confirm you have java installed and if not install java
+<pre>
+basondole@netbox:~/ncs-run$ java -version
+
+Command 'java' not found, but can be installed with:
+
+sudo apt install default-jre
+sudo apt install openjdk-11-jre-headless
+sudo apt install openjdk-8-jre-headless
+
+basondole@netbox:~/ncs-run$ sudo apt-get update -y
+.
+.
+basondole@netbox:~/ncs-run$ sudo apt-get install openjdk-11-jre -y
+.
+.
+basondole@netbox:~/ncs-run$ sudo apt-get install ant -y
+.
+.
+basondole@netbox:~/ncs-run$ java -version
+openjdk version "11.0.5" 2019-10-15
+OpenJDK Runtime Environment (build 11.0.5+10-post-Ubuntu-0ubuntu1.118.04)
+OpenJDK 64-Bit Server VM (build 11.0.5+10-post-Ubuntu-0ubuntu1.118.04, mixed mode, sharing)
+</pre>
+
+Also confirm the packages are available on the directory you are running NSO from
+in my case I'm running NSO from `~/ncs-run`
+<pre>
+basondole@netbox:~/ncs-run$ ls packages/
+basondole@netbox:~/ncs-run$
+</pre>
+
+If the package directory is empty copy the NEDs from the `$NCS_DIR` directory
+<pre>
+basondole@netbox:~/ncs-run$ cp -r ~/nso-5.1.0.1/packages/neds/* ./packages/
+basondole@netbox:~/ncs-run$ ls packages/
+cisco-ios-cli-3.0  cisco-iosxr-cli-3.0  cisco-nx-cli-3.0
+cisco-ios-cli-3.8  cisco-iosxr-cli-3.5  juniper-junos-nc-3.0
+</pre>
+
+Loggin to the ncs and reload the packages
+<pre>
+basondole@netbox:~/ncs-run$ ncs_cli -u admin -C
+admin@ncs# packages reload
+.
+reload-result {
+    package cisco-iosxr-cli-3.5
+    result false
+    <b>info --ERROR--</b>
+}
+reload-result {
+    package cisco-nx-cli-3.0
+    result false
+    <b>info --ERROR--</b>
+}
+reload-result {
+    package dell-ftos-cli-3.0
+    result false
+    <b>info --ERROR--</b>
+}
+reload-result {
+    package juniper-junos-nc-3.0
+    <b>result true</b>
+}
+basondole@ncs# show packages package oper-status
+                                                                                         PACKAGE
+                          PROGRAM                                                        META     FILE
+                          CODE     JAVA           BAD NCS  PACKAGE  PACKAGE  CIRCULAR    DATA     LOAD   ERROR
+NAME                  UP  ERROR    UNINITIALIZED  VERSION  NAME     VERSION  DEPENDENCY  ERROR    ERROR  INFO
+----------------------------------------------------------------------------------------------------------------
+cisco-ios-cli-3.0     -   -        X              -        -        -        -           -        -      -
+cisco-nx-cli-3.0      -   -        X              -        -        -        -           -        -      -
+cisco-iosxr-cli-3.0   -   -        X              -        -        -        -           -        -      -
+dell-ftos-cli-3.0     -   -        X              -        -        -        -           -        -      -
+juniper-junos-nc-3.0  X   -        -              -        -        -        -           -        -      -
+
+basondole@ncs# exit
+</pre>
+
+From above we see we had errors loading a couple of NEDs with `java unitialized` status
+The issue here is very likely related to the JavaVM, since all the Java packages are failing,
+while the Junos NETCONF NED (which doesn't use any Java) is fine.
+Since we have quite a few NEDs, the issue is almost certainly that the JavaVM is out of memory/heap space.
