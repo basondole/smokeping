@@ -254,7 +254,8 @@ You can add this to your `.bash_profile` so that it is done automatically everyt
 We then relaunch the ncs
 <pre>
 basondole@netbox:~/ncs-run$ ncs --stop
-basondole@netbox:~/ncs-run$ ncs_cli -c admin -C
+basondole@netbox:~/ncs-run$ ncs
+basondole@netbox:~/ncs-run$ ncs_cli -C
 
 basondole connected from 192.168.56.1 using ssh on netbox
 
@@ -264,6 +265,8 @@ basondole@ncs# packages reload
 >>> Sessions in configure mode must exit to operational mode.
 >>> No configuration changes can be performed until upgrade has completed.
 >>> System upgrade has completed successfully.
+.
+.
 reload-result {
     package cisco-iosxr-cli-3.0
     <b>result true</b>
@@ -283,8 +286,11 @@ basondole@ncs# show packages package oper-status
                           CODE     JAVA           BAD NCS  PACKAGE  PACKAGE  CIRCULAR    DATA     LOAD   ERROR
 NAME                  UP  ERROR    UNINITIALIZED  VERSION  NAME     VERSION  DEPENDENCY  ERROR    ERROR  INFO
 ----------------------------------------------------------------------------------------------------------------
+cisco-ios-cli-3.0     X   -        -              -        -        -        -           -        -      -
+cisco-ios-cli-3.8     X   -        -              -        -        -        -           -        -      -
 cisco-iosxr-cli-3.0   X   -        -              -        -        -        -           -        -      -
 cisco-iosxr-cli-3.5   X   -        -              -        -        -        -           -        -      -
+cisco-nx-cli-3.0      X   -        -              -        -        -        -           -        -      -
 juniper-junos-nc-3.0  X   -        -              -        -        -        -           -        -      -
 
 basondole@ncs# exit
