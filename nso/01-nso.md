@@ -323,3 +323,41 @@ SNo. ID       User       Client      Time Stamp          Label       Comment
 1000 10002    admin      cli         2019-12-24 13:51:41
 1000 10001    system     system      2019-11-13 13:42:45
 </pre>
+
+
+## Configuring devices for nso
+> configuration is pulled from devices I used on my presentation on Pycon Tanzania excuse pycon for hostname
+Cisco IOS XR
+<pre>
+RP/0/0/CPU0:pycon-iosxr(config)#show configuration 
+Tue Dec 24 14:10:36.560 UTC
+Building configuration...
+username fisi
+ secret 5 $1$UV0J$uNLTpu2nr6K2ZhY7z2cks/
+ssh server v2
+ssh server netconf port 830
+ssh server logging
+netconf-yang agent ssh
+RP/0/0/CPU0:pycon-iosxr(config)#commit
+RP/0/0/CPU0:pycon-iosxr(config)#exit
+RP/0/0/CPU0:pycon-iosxr#crypto key generate rsa 
+</pre>
+
+JunOS
+<pre>
+fisi@pycon-junos> show configuration system services
+ssh;
+netconf {
+    ssh;
+}
+
+fisi@pycon-junos> show configuration system login user fisi
+uid 2000;
+class super-user;
+authentication {
+    encrypted-password "$1$ty9HKQjx$n3zBLWY5HgycHOQW2/epX/"; ## SECRET-DATA
+}
+</pre>
+
+IOS  
+Only configure ssh
