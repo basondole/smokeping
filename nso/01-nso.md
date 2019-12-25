@@ -326,7 +326,7 @@ SNo. ID       User       Client      Time Stamp          Label       Comment
 
 
 ## Configuring devices for nso
-> Configuration is pulled from devices I used on my presentation at Pycon Tanzania Dec 2019 excuse th use of pycon for hostnames  
+> Configuration is pulled from devices I used on my presentation at Pycon Tanzania Dec 2019 excuse the use of pycon for hostnames  
 
 Cisco IOS XR
 <pre>
@@ -360,5 +360,145 @@ authentication {
 }
 </pre>
 
-IOS  
+Cisco IOS  
 Only configure ssh
+
+
+
+## Adding a cisco ios xr device to nso
+<pre>
+admin@ncs(config)# devices device pycon-iosxr
+admin@ncs(config-device-pycon-iosxr)# address 192.168.56.65
+admin@ncs(config-device-pycon-iosxr)# authgroup GROUP01
+admin@ncs(config-device-pycon-iosxr)# device-type cli ned-id cisco-iosxr-cli-3.5
+admin@ncs(config-device-pycon-iosxr)# device-type cli protocol ssh
+admin@ncs(config-device-pycon-iosxr)# state admin-state unlocked
+admin@ncs(config-device-pycon-iosxr)# top
+admin@ncs(config)# commit check
+Validation complete
+admin@ncs(config)# show configuration diff
++devices device pycon-iosxr
++ address   192.168.56.65
+ !
++devices authgroups group GROUP01
++ default-map remote-name fisi
++ default-map remote-password $8$1SgUsPkoEaFvTwK02flfv5Ta5ut9WBf+I1m+OaTo8vQ=
++!
+ devices device pycon-iosxr
++ authgroup GROUP01
++ device-type cli ned-id cisco-iosxr-cli-3.0
++ device-type cli protocol ssh
++ state admin-state unlocked
++ config
++  no ios:service pad
++  no ios:ip domain-lookup
++  no ios:service password-encryption
++  no ios:cable admission-control preempt priority-voice
++  no ios:cable qos permission create
++  no ios:cable qos permission update
++  no ios:cable qos permission modems
++  no ios:ip cef
++  no ios:ip forward-protocol nd
++  no ios:ipv6 source-route
++  no ios:ipv6 cef
++  no nx:feature ssh
++  no nx:feature telnet
++ !
++!
+admin@ncs(config)# commit
+Commit complete.
+
+admin@ncs(config)# do show running-config | begin pycon
+devices device pycon-iosxr
+ address   192.168.56.65
+ authgroup GROUP01
+ device-type cli ned-id cisco-iosxr-cli-3.0
+ device-type cli protocol ssh
+ state admin-state unlocked
+ config
+  no ios:service pad
+  no ios:ip domain-lookup
+  no ios:service password-encryption
+  no ios:cable admission-control preempt priority-voice
+  no ios:cable qos permission create
+  no ios:cable qos permission update
+  no ios:cable qos permission modems
+  no ios:ip cef
+  no ios:ip forward-protocol nd
+  no ios:ipv6 source-route
+  no ios:ipv6 cef
+  no nx:feature ssh
+  no nx:feature telnet
+.
+.
+
+admin@ncs# show devices brief
+NAME         ADDRESS        DESCRIPTION  NED ID
+------------------------------------------------------------
+pycon-iosxr  192.168.56.65  -            cisco-iosxr-cli-3.0
+
+</pre>
+
+After adding the device we fetch its ssh keys and then sync-from so as to sychronise the device config to the ncs database
+<pre>
+admin@ncs# devices device pycon-iosxr ssh fetch-host-keys
+result updated
+fingerprint {
+    algorithm ssh-rsa
+    value f6:46:c1:32:19:24:ff:21:e6:ac:0f:85:78:94:77:40
+}
+
+admin@ncs# devices device pycon-iosxr ping
+result PING 192.168.56.65 (192.168.56.65) 56(84) bytes of data.
+64 bytes from 192.168.56.65: icmp_seq=1 ttl=255 time=6.24 ms
+
+--- 192.168.56.65 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 6.246/6.246/6.246/0.000 ms
+
+admin@ncs# devices device pycon-iosxr sync-from
+result true
+admin@ncs#
+admin@ncs# show devices device pycon-iosxr config
+config
+ yanglib:modules-state module-set-id 762f393abd3986410711f2cf22587ccd
+ yanglib:modules-state module tailf-ned-cisco-ios-xr 2014-02-18
+  namespace        http://tail-f.com/ned/cisco-ios-xr
+  conformance-type implement
+admin@ncs#
+</pre>
+
+Now after synching the config from the router to the ncs database, we logon to the router and change configuration
+<pre>
+RP/0/0/CPU0:pycon-iosxr(config)#username baggy
+RP/0/0/CPU0:pycon-iosxr(config-un)#show commi chan diff
+Tue Dec 24 14:45:24.827 UTC
+Building configuration...
+!! IOS XR Configuration 5.3.0
++  username baggy
+   !
+end
+
+RP/0/0/CPU0:pycon-iosxr(config-un)#commit
+</pre>
+
+Then we check with the ncs to see what has changed
+<pre>
+admin@ncs# devices device pycon-iosxr compare-config
+diff
+ devices {
+     device pycon-iosxr {
+         config {
++            cisco-ios-xr:username baggy {
++            }
+         }
+     }
+ }
+admin@ncs#
+</pre>
+
+We see the config that we added on the router is displayed, this is the diff between the actual config on the device and
+the config on the ncs database. Here we can either `sync-from` this device to update the ncs copy of the config or `sync-to`
+to push the config from ncs to the device and removing the added config. 
+In this case we synced from the device however this was done via web ui
+
