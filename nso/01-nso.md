@@ -53,6 +53,21 @@ INFO  NCS installation complete
 basondole@netbox:~/nso$
 </pre>
 
+#### Incase of a python error 
+<pre>
+basondole@netbox:~/nso$ sh nso-5.1.0.1
+Unpacking...
+ERROR Verification requires Python version 2.7.4 or later.
+ERROR
+</pre>
+To overcome this do a python install then extrat the file again
+<pre>
+basondole@netbox:~/nso$ sudo apt install python
+.
+.
+basondole@netbox:~/nso$ sh nso-5.1.0.1.linux.x86_64.installer.bin $HOME/nso-5.1.0.1
+</pre>
+
 ## Running the nso
 
 <pre>
@@ -90,3 +105,16 @@ admin connected from 192.168.56.1 using ssh on netbox
 admin@ncs# exit
 basondole@netbox:~/ncs-run$
 </pre>
+
+
+## Configuration
+To enable pasting of multiple lines of text in the ncs cli add below lines in the ncs config file
+
+`basondole@netbox:~/ncs-run$ nano ncs.conf`
+<pre>
+<enabled>true</enabled>
+<space-completion><enabled>false</enabled></space-completion>
+<ignore-leading-whitespace>true</ignore-leading-whitespace>
+<auto-wizard><enabled>false</enabled></auto-wizard>
+</pre>
+
