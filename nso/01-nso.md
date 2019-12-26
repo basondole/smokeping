@@ -635,6 +635,12 @@ admin@ncs(config)# devices device big check-sync
 result in-sync
 </pre>
 
+You will notice the config flow is not exactly what we are used to with a junos device
+however it follows the same hierarchy with `junos:configuration` being the top level of the config
+from which we can go to any other sub stanza and get a corresponding prompt for that
+for example the command `junos:configuration groups PYCON` gets us to the `(config-groups-PYCON)` prompt
+same as `edit groups PYCON` would take us to `[edit groups PYCON]` on the JunoS cli
+
 We now logon to the junos device and check the config that's been pushed from the nso
 <pre>
 fisi@big> show system commit | match ^0
