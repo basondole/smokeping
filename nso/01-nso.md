@@ -439,7 +439,7 @@ pycon-iosxr  192.168.56.65  -            cisco-iosxr-cli-3.0
 
 </pre>
 
-After adding the device we fetch its ssh keys and then sync-from so as to sychronise the device config to the ncs database
+After adding the device we fetch its ssh keys and then `sync-from` so as to sychronise the device config to the ncs database
 <pre>
 admin@ncs# devices device pycon-iosxr ssh fetch-host-keys
 result updated
@@ -500,5 +500,176 @@ admin@ncs#
 We see the config that we added on the router is displayed, this is the diff between the actual config on the device and
 the config on the ncs database. Here we can either `sync-from` this device to update the ncs copy of the config or `sync-to`
 to push the config from ncs to the device and removing the added config. 
-In this case we synced from the device however this was done via web ui
+In this case we synced from the device however this was done via web ui.
 
+Back on the device we revert the change and remove the username
+<pre>
+
+
+RP/0/0/CPU0:pycon-iosxr(config)#load rollback changes last 1
+Building configuration...
+Loading.
+53 bytes parsed in 1 sec (51)bytes/sec
+RP/0/0/CPU0:pycon-iosxr(config)#show commi chan diff        
+Tue Dec 24 14:50:27.226 UTC
+Building configuration...
+!! IOS XR Configuration 5.3.0
+-  username baggy
+end
+
+RP/0/0/CPU0:pycon-iosxr(config)#commit
+</pre>
+
+Then we check with ncs to see what's changed. The `dry-run` option allows us to preview of what would happen if we are to sync the config but with this option the ncs doesnt actually sync the config. After the dry run we then sync the config from device to ncs database
+We can use the `show run` command to check the synced config
+
+<pre>
+admin@ncs# devices device pycon-iosxr sync-from dry-run
+cli  config {
+     -    cisco-ios-xr:username baggy {
+     -    }
+      }
+
+admin@ncs# devices device pycon-iosxr sync-from
+result true
+admin@ncs#
+admin@ncs# show running-config devices device pycon-iosxr
+</pre>
+
+
+## Adding an ios device
+<pre>
+devices device pycon-ios
+ address   192.168.56.63
+ authgroup GROUP01
+ device-type cli ned-id cisco-ios-cli-3.0
+ device-type cli protocol ssh
+ state admin-state unlocked
+top
+commit
+devices device pycon-ios ssh fetch-host-keys
+devices device pycon-ios sync-from
+</pre>
+
+## Adding a Junos device
+<pre>
+devices device big
+ address   192.168.56.36
+ authgroup GROUP01
+ device-type netconf ned-id juniper-junos-nc-3.0
+ state admin-state unlocked
+top
+commit
+devices device big ssh fetch-host-keys
+devices device big sync-from
+</pre>
+
+Configuring junos device with an apply-group
+<pre>
+admin@ncs(config)# devices device big config
+admin@ncs(config-config)# junos:configuration groups PYCON
+admin@ncs(config-groups-PYCON)# system login
+admin@ncs(config-groups-PYCON)# system login class pycon-su
+admin@ncs(config-class-pycon-su)# logical-system pycon-junos
+admin@ncs(config-class-pycon-su)# permissions all
+admin@ncs(config-class-pycon-su)# exit
+admin@ncs(config-groups-PYCON)# system login user pycon class pycon-su
+admin@ncs(config-user-pycon)# uid 2009
+admin@ncs(config-user-pycon)# authentication encrypted-password "$1$bq.XK5AI$33.xHE4FRDm30frQY.9gx0"
+admin@ncs(config-user-pycon)# exit
+admin@ncs(config-groups-PYCON)# exit
+admin@ncs(config-config)# junos:configuration apply-groups PYCON
+admin@ncs(config-config)# exit
+admin@ncs(config-device-big)# exit
+admin@ncs(config)# show configuration devices device big
+devices device big
+ config
+  junos:configuration apply-groups [ PYCON ]
+  junos:configuration groups PYCON
+   system login class pycon-su
+    logical-system pycon-junos
+    permissions    [ all ]
+   !
+   system login user pycon
+    uid   2009
+    class pycon-su
+    authentication encrypted-password $1$bq.XK5AI$33.xHE4FRDm30frQY.9gx0
+    authentication ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCZGRQBprO0LQeiUDW2hR7Yfj3DIF5MbBiG+3/ZyuedS0shbSwxLOMBNhU7MAuXKVuvtzAsFy/IAKN41LhSvq7ppg0Bq+qMsxKJ8U8BY0svM+Hzpe+fJIfJz6R2dp+R79t+EYRR1UdYQO60I2fUdIgazR1AHV1H/6fO/TNXykI2PsqeXSfrTo8Li/WAyRt+1C+U6LPUO5OnkbP+cJxeqtDPkz1I2I7d4izonbmCrIegIGlGpx1ib2/WmqkpX+r0+iqrCQll7TvM73yduC31qMks/g+ncfeuVQPHdLsTlmNWt3MlLCCo+/lVbsMZJuAs38cn4UfpE78qdGY00r4MHIlJ paul@LWBS-STZ-150YNL;"
+    !
+   !
+  !
+ !
+!
+admin@ncs(config)#
+admin@ncs(config)# show configuration diff
+ devices device big
+  config
++  junos:configuration apply-groups [ PYCON ]
++  junos:configuration groups PYCON
++   system login class pycon-su
++    logical-system pycon-junos
++    permissions    [ all ]
++   !
++   system login user pycon
++    uid   2009
++    class pycon-su
++    authentication encrypted-password $1$bq.XK5AI$33.xHE4FRDm30frQY.9gx0
++    authentication ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCZGRQBprO0LQeiUDW2hR7Yfj3DIF5MbBiG+3/ZyuedS0shbSwxLOMBNhU7MAuXKVuvtzAsFy/IAKN41LhSvq7ppg0Bq+qMsxKJ8U8BY0svM+Hzpe+fJIfJz6R2dp+R79t+EYRR1UdYQO60I2fUdIgazR1AHV1H/6fO/TNXykI2PsqeXSfrTo8Li/WAyRt+1C+U6LPUO5OnkbP+cJxeqtDPkz1I2I7d4izonbmCrIegIGlGpx1ib2/WmqkpX+r0+iqrCQll7TvM73yduC31qMks/g+ncfeuVQPHdLsTlmNWt3MlLCCo+/lVbsMZJuAs38cn4UfpE78qdGY00r4MHIlJ paul@LWBS-STZ-150YNL;"
++    !
++   !
++  !
+  !
+ !
+admin@ncs(config)#
+admin@ncs(config)# devices device big check-sync
+result out-of-sync
+info got: 2019-12-24 20:07:03 UTC expected: 2019-12-24 19:24:50 UTC
+
+admin@ncs(config)# commit no-out-of-sync-check
+Commit complete.
+admin@ncs(config)# devices device big check-sync
+result unknown
+admin@ncs(config)# devices device big sync-to
+result true
+admin@ncs(config)# devices device big check-sync
+result in-sync
+</pre>
+
+We now logon to the junos device and check the config that's been pushed from the nso
+<pre>
+fisi@big> show system commit | match ^0
+0   2019-12-24 20:07:57 UTC by fisi via netconf
+
+fisi@big> show configuration groups
+PYCON {
+    system {
+        login {
+            class pycon-su {
+                logical-system pycon-junos;
+                permissions all;
+            }
+            user pycon {
+                uid 2009;
+                class pycon-su;
+                authentication {
+                    encrypted-password "$1$bq.XK5AI$33.xHE4FRDm30frQY.9gx0"; ## SECRET-DATA
+                    ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCZGRQBprO0LQeiUDW2hR7Yfj3DIF5MbBiG+3/ZyuedS0shbSwxLOMBNhU7MAuXKVuvtzAsFy/IAKN41LhSvq7ppg0Bq+qMsxKJ8U8BY0svM+Hzpe+fJIfJz6R2dp+R79t+EYRR1UdYQO60I2fUdIgazR1AHV1H/6fO/TNXykI2PsqeXSfrTo8Li/WAyRt+1C+U6LPUO5OnkbP+cJxeqtDPkz1I2I7d4izonbmCrIegIGlGpx1ib2/WmqkpX+r0+iqrCQll7TvM73yduC31qMks/g+ncfeuVQPHdLsTlmNWt3MlLCCo+/lVbsMZJuAs38cn4UfpE78qdGY00r4MHIlJ paul@LWBS-STZ-150YNL;"; ## SECRET-DATA
+                }
+            }
+        }
+    }
+}
+
+fisi@big> show configuration apply-groups
+## Last commit: 2019-12-24 20:07:57 UTC by fisi
+apply-groups PYCON;
+
+fisi@big>
+</pre>
+
+From the above example we see the confiuration has indeed taken effect on the device.
+
+### Reference
+http://www.zhaocs.info/new-install-nso-and-connect-with-xr-by-cli-netconf-ned.html
+https://pocvlab.com/installing-cisco-nso-in-eve-ng/
+https://github.com/NSO-developer/nso-5-day-training/blob/master/Day1Labs/lab1_Creating_Your_First_Network.md
