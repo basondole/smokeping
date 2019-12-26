@@ -639,7 +639,7 @@ You will notice the config flow is not exactly what we are used to with a junos 
 however it follows the same hierarchy with `junos:configuration` being the top level of the config
 from which we can go to any other sub stanza and get a corresponding prompt for that
 for example the command `junos:configuration groups PYCON` gets us to the `(config-groups-PYCON)` prompt
-same as `edit groups PYCON` would take us to `[edit groups PYCON]` on the JunoS cli
+same as `edit groups PYCON` would take us to `[edit groups PYCON]` on the JunoS CLI.
 
 We now logon to the junos device and check the config that's been pushed from the nso
 <pre>
@@ -674,6 +674,7 @@ fisi@big>
 </pre>
 
 From the above example we see the confiuration has indeed taken effect on the device.
+This operation was done via the ncs CLI but we can achieve the same effect via the web frontend as well.
 
 ### Reference
 http://www.zhaocs.info/new-install-nso-and-connect-with-xr-by-cli-netconf-ned.html
