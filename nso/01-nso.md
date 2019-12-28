@@ -564,7 +564,9 @@ devices device big ssh fetch-host-keys
 devices device big sync-from
 </pre>
 
-Configuring junos device with an apply-group
+Configuring junos device
+> In this snippet we will configure an `apply-group` and apply it in the junos device
+
 <pre>
 admin@ncs(config)# devices device big config
 admin@ncs(config-config)# junos:configuration groups PYCON
