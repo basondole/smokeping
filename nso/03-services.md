@@ -240,3 +240,78 @@ admin@ncs(config)# commit
 Commit complete.
 admin@ncs(config)#
 </pre>
+
+## Verification
+`basondole@netbox:~/nso/ncs-run/packages/simple_radius$ cd ../../netsim/`
+
+### ios xr
+<pre>
+basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim cli-i netsim-xr-00
+
+admin connected from 192.168.56.1 using ssh on netbox
+netbox> enable
+netbox# show run
+logging 10.10.1.100
+domain name basondole.org
+radius-server host 10.10.1.100 auth-port 1812 acct-port 1813
+ key fisi321
+exit
+ntp
+ server 10.10.1.100
+exit
+username fisi
+ privilege 15
+exit
+netbox# exit
+</pre>
+
+### nx os
+<pre>
+basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim cli-i netsim-nx-00
+
+admin connected from 192.168.56.1 using ssh on netbox
+netbox> enable
+netbox# show run
+no feature ssh
+no feature telnet
+username fisi password fisi123
+ip domain-name basondole.org
+!
+ntp server 10.10.1.100
+logging server 10.10.1.100
+radius-server host 10.10.1.100 key 0 fisi321
+netbox# exit
+</pre>
+
+### junos
+<pre>
+basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim cli netsim-junos-00
+
+admin connected from 192.168.56.1 using ssh on netbox
+admin@netsim-junos-00>show configuration configuration system
+host-name   netsim-junos-00;
+domain-name basondole.org;
+radius-server 10.10.1.100 {
+    port            1812;
+    accounting-port 1813;
+    secret          fisi321;
+}
+login {
+    user fisi {
+        class super-user;
+        authentication {
+            plain-text-password-value fisi123;
+        }
+    }
+}
+syslog {
+    host 10.10.1.100;
+}
+ntp {
+    server 10.10.1.100;
+}
+[ok][2019-12-28 17:54:53]
+admin@netsim-junos-00>exit
+basondole@netbox:~/nso/ncs-run/netsim$
+</pre>
+
