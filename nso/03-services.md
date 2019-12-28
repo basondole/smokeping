@@ -317,3 +317,38 @@ admin@netsim-junos-00>exit
 basondole@netbox:~/nso/ncs-run/netsim$
 </pre>
 
+
+### Using the nso with junos-like cli to deploy service
+<pre>
+basondole@netbox:~/nso/ncs-run/netsim$ ncs_cli -u admin
+
+admin connected from 192.168.56.1 using ssh on netbox
+admin@ncs> configure
+Entering configuration mode private
+[ok][2019-12-28 18:22:15]
+
+[edit]
+admin@ncs% set services simple_radius 10.1.1.1 device pycon-iosxr secret fisi123
+[ok][2019-12-28 18:23:36]
+
+[edit]
+admin@ncs% show | compare
+ services {
++    simple_radius 10.1.1.1 {
++        device [ pycon-iosxr ];
++        secret [ fisi123 ];
++    }
+ }
+[ok][2019-12-28 18:23:42]
+
+[edit]
+admin@ncs% commit check
+Validation complete
+[ok][2019-12-28 18:24:01]
+
+[edit]
+admin@ncs% commit
+
+[edit]
+admin@ncs%
+</pre>
