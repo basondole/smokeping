@@ -243,6 +243,24 @@ admin@ncs(config)#
 </pre>
 
 ## Verification
+
+<pre>
+basondole@netbox:~/nso/ncs-run/packages/simple_radius$ ncs_cli -u admin
+
+admin connected from 192.168.56.1 using ssh on netbox
+admin@ncs> configure
+[edit]
+admin@ncs% show services simple_radius | tab
+
+SERVER IP    DEVICE                                         SECRET
+-------------------------------------------------------------------------
+10.10.1.100  [ netsim-junos-00 netsim-nx-00 netsim-xr-00 ]  [ fisi321 ]
+
+[ok][2019-12-28 18:31:01]
+
+[edit]
+</pre>
+
 Switching to the `netsim` directory so as to access the emulated devices  
 `basondole@netbox:~/nso/ncs-run/packages/simple_radius$ cd ../../netsim/`
 
@@ -350,5 +368,48 @@ Validation complete
 admin@ncs% commit
 
 [edit]
+admin@ncs%
+</pre>
+
+### Un-deploying and re-ploying service
+Un-deploying the service
+
+<pre>
+basondole@netbox:~/nso/ncs-run/netsim$ ncs_cli -u admin
+
+admin connected from 192.168.56.1 using ssh on netbox
+admin@ncs> configure
+Entering configuration mode private
+[ok][2019-12-28 19:09:51]
+
+[edit]
+admin@ncs% edit services simple_radius 10.10.1.100
+[ok][2019-12-28 19:09:56]
+
+[edit services simple_radius 10.10.1.100]
+admin@ncs% <b>request un-deploy</b>
+[ok][2019-12-28 19:10:05]
+
+[edit services simple_radius 10.10.1.100]
+admin@ncs% request check-sync
+<b>in-sync false</b>
+[ok][2019-12-28 19:10:11]
+</pre>
+
+Re-deploying the service
+<pre>
+[edit services simple_radius 10.10.1.100]
+admin@ncs% request re-deploy
+[ok][2019-12-28 19:10:19]
+
+[edit services simple_radius 10.10.1.100]
+admin@ncs%
+System message at 2019-12-28 19:10:19...
+Commit performed by admin via ssh using cli.
+admin@ncs% request check-sync
+<b>in-sync true</b>
+[ok][2019-12-28 19:10:22]
+
+[edit services simple_radius 10.10.1.100]
 admin@ncs%
 </pre>
