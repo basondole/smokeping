@@ -110,3 +110,69 @@ fingerprint {
 admin@ncs(config)#
 </pre>
 
+### Adding multiple devices
+Verifying the NEDs available
+<pre>
+basondole@netbox:~/nso/ncs-run$ ls
+logs  ncs-cdb  ncs.conf  packages  README.ncs  scripts  state  storedstate  target
+basondole@netbox:~/nso/ncs-run$ ls packages/
+cisco-ios-cli-3.8  cisco-iosxr-cli-3.5  juniper-junos-nc-3.0
+cisco-ios-cli-3.0  cisco-iosxr-cli-3.0  cisco-nx-cli-3.0
+basondole@netbox:~/nso/ncs-run$
+</pre>
+
+Creating the devices
+<pre>
+basondole@netbox:~/nso/ncs-run$ ncs-netsim create-device cisco-ios-cli-3.8 netsim-ios-00
+DEVICE netsim-ios-00 CREATED
+basondole@netbox:~/nso/ncs-run$ ncs-netsim add-device cisco-iosxr-cli-3.5 netsim-xr-00
+DEVICE netsim-xr-00 CREATED
+basondole@netbox:~/nso/ncs-run$ ncs-netsim add-device juniper-junos-nc-3.0 netsim-junos-00
+DEVICE netsim-junos-00 CREATED
+basondole@netbox:~/nso/ncs-run$ ls
+logs  ncs-cdb  ncs.conf  <b>netsim</b>  packages  README.ncs  scripts  state  storedstate  target
+basondole@netbox:~/nso/ncs-run$
+</pre>
+> Note we initially created one device using `create-device`. The following devices were added using `add-device`
+
+Starting the devices
+<pre>
+basondole@netbox:~/nso/ncs-run$ cd netsim
+basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim start netsim-ios-00
+DEVICE netsim-ios-00 OK STARTED
+basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim start netsim-xr-00
+DEVICE netsim-xr-00 OK STARTED
+basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim start netsim-junos-00
+DEVICE netsim-junos-00 OK STARTED
+basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim list
+ncs-netsim list for  /home/basondole/nso/ncs-run/netsim
+
+name=netsim-ios-00 netconf=12022 snmp=11022 ipc=5010 cli=10022 dir=/home/basondole/nso/ncs-run/netsim/netsim-ios-00/netsim-ios-00
+name=netsim-xr-00 netconf=12023 snmp=11023 ipc=5011 cli=10023 dir=/home/basondole/nso/ncs-run/netsim/netsim-xr-00/netsim-xr-00
+name=netsim-junos-00 netconf=12024 snmp=11024 ipc=5012 cli=10024 dir=/home/basondole/nso/ncs-run/netsim/netsim-junos-00/netsim-junos-00
+basondole@netbox:~/nso/ncs-run/netsim$
+</pre>
+
+Connecting to the devices via ssh
+<pre>
+basondole@netbox:~/nso/ncs-run/netsim$ ssh admin@127.0.0.1 -p 10022
+admin@127.0.0.1's password:
+
+admin connected from 127.0.0.1 using ssh on netbox
+<b>netsim-ios-00> exit</b>
+Connection to 127.0.0.1 closed.
+basondole@netbox:~/nso/ncs-run/netsim$ ssh admin@127.0.0.1 -p 10023
+admin@127.0.0.1's password:
+
+admin connected from 127.0.0.1 using ssh on netbox
+<b>netbox# exit</b>
+Connection to 127.0.0.1 closed.
+basondole@netbox:~/nso/ncs-run/netsim$ ssh admin@127.0.0.1 -p 10024
+admin@127.0.0.1's password:
+
+admin connected from 127.0.0.1 using ssh on netbox
+<b>admin@netsim-junos-00>exit</b>
+Connection to 127.0.0.1 closed.
+basondole@netbox:~/nso/ncs-run/netsim$
+</pre>
+
