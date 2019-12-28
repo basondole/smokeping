@@ -1,5 +1,5 @@
 # Services
-### creating radius server service
+### Creating service for deploying radius server
 Creating an Yang Module using NSO Bash commands
 ```
 basondole@netbox:~/nso/ncs-run/packages$ ncs-make-package --service-skeleton template simple_radius --augment /ncs:services
@@ -59,14 +59,15 @@ Below are the configuration options
 - server ip
 - authentication port
 - accounting port
-- key
+- key  
+
 We configure this on the NSO and then we produce the xml formatted config.
 ```
 basondole@netbox:~/ncs-run/packages/simple_radius/src$ ncs_cli -C
 basondole@ncs# config
 Entering configuration mode terminal
 basondole@ncs(config)# devices device pycon-iosxr config cisco-ios-xr:radius-server host 10.10.1.100 auth-port 1812 acct-port 1813
-basondole@ncs(config-radius-host)# commit dry-run <b>outformat xml</b>
+basondole@ncs(config-radius-host)# commit dry-run outformat xml
 result-xml {
     local-node {
         data <devices xmlns="http://tail-f.com/ns/ncs">
@@ -242,6 +243,7 @@ admin@ncs(config)#
 </pre>
 
 ## Verification
+Switching to the `netsim` directory so as to access the emulated devices  
 `basondole@netbox:~/nso/ncs-run/packages/simple_radius$ cd ../../netsim/`
 
 ### ios xr
