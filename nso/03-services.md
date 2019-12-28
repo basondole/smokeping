@@ -399,7 +399,7 @@ admin@ncs% request check-sync
 Re-deploying the service
 <pre>
 [edit services simple_radius 10.10.1.100]
-admin@ncs% request re-deploy
+admin@ncs% <b>request re-deploy</b>
 [ok][2019-12-28 19:10:19]
 
 [edit services simple_radius 10.10.1.100]
