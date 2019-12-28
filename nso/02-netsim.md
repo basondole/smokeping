@@ -286,7 +286,7 @@ devices xmlns="http://tail-f.com/ns/ncs">
  
  Loading the devices to the nso
  <pre>
- basondole@netbox:~/nso/ncs-run/netsim$ ncs_load -l -m devices.xml
+basondole@netbox:~/nso/ncs-run/netsim$ ncs_load -l -m devices.xml
 basondole@netbox:~/nso/ncs-run/netsim$ ncs_cli -C
 
 basondole connected from 192.168.56.1 using ssh on netbox
@@ -298,5 +298,49 @@ netsim-junos-00  127.0.0.1      -            juniper-junos-nc-3.0
 netsim-nx-00     127.0.0.1      -            cisco-nx-cli-3.0
 netsim-xr-00     127.0.0.1      -            cisco-iosxr-cli-3.5
 basondole@ncs#
+</pre>
+
+
+### Adding devices to a group
+<pre>
+basondole@netbox:~/nso/ncs-run/netsim$ ncs_cli -C -u admin
+
+admin connected from 192.168.56.1 using ssh on netbox
+admin@ncs# config
+admin@ncs(config)# devices device-group netsim
+admin@ncs(config-device-group-netsim)# device-name netsim-ios-00
+admin@ncs(config-device-group-netsim)# device-name netsim-xr-00
+admin@ncs(config-device-group-netsim)# device-name netsim-nx-00
+admin@ncs(config-device-group-netsim)# device-name netsim-junos-00
+admin@ncs(config-device-group-netsim)# top
+admin@ncs(config)# show configuration
+devices device-group netsim
+ device-name [ netsim-ios-00 netsim-junos-00 netsim-nx-00 netsim-xr-00 ]
+!
+admin@ncs(config)# commit
+Commit complete.
+admin@ncs(config)# do show devices device-group member
+NAME    MEMBER
+---------------------------------------------------------------------
+netsim  [ netsim-ios-00 netsim-junos-00 netsim-nx-00 netsim-xr-00 ]
+
+admin@ncs(config)# do devices device-group netsim sync-from
+sync-result {
+    device netsim-ios-00
+    result true
+}
+sync-result {
+    device netsim-junos-00
+    result true
+}
+sync-result {
+    device netsim-nx-00
+    result true
+}
+sync-result {
+    device netsim-xr-00
+    result true
+}
+admin@ncs(config)#
 </pre>
 
