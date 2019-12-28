@@ -256,7 +256,7 @@ basondole@ncs# exit
 ```
 
 We then copy the `device-type` and paste in the corresponding section in the `device.xml file`
- `device.xml` then becomes
+which then becomes
 
 ```
 basondole@netbox:~/nso/ncs-run/netsim$ less devices.xml
@@ -283,3 +283,20 @@ devices xmlns="http://tail-f.com/ns/ncs">
      </device-type>
    </device>
  ```
+ 
+ Loading the devices to the nso
+ <pre>
+ basondole@netbox:~/nso/ncs-run/netsim$ ncs_load -l -m devices.xml
+basondole@netbox:~/nso/ncs-run/netsim$ ncs_cli -C
+
+basondole connected from 192.168.56.1 using ssh on netbox
+basondole@ncs# show devices brief
+NAME             ADDRESS        DESCRIPTION  NED ID
+-----------------------------------------------------------------
+netsim-ios-00    127.0.0.1      -            cisco-ios-cli-3.8
+netsim-junos-00  127.0.0.1      -            juniper-junos-nc-3.0
+netsim-nx-00     127.0.0.1      -            cisco-nx-cli-3.0
+netsim-xr-00     127.0.0.1      -            cisco-iosxr-cli-3.5
+basondole@ncs#
+</pre>
+
