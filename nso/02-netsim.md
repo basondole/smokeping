@@ -139,11 +139,11 @@ Starting the devices
 <pre>
 basondole@netbox:~/nso/ncs-run$ cd netsim
 basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim start netsim-ios-00
-DEVICE netsim-ios-00 OK STARTED
+<b>DEVICE netsim-ios-00 OK STARTED</b>
 basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim start netsim-xr-00
-DEVICE netsim-xr-00 OK STARTED
+<b>DEVICE netsim-xr-00 OK STARTED</b>
 basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim start netsim-junos-00
-DEVICE netsim-junos-00 OK STARTED
+<b>DEVICE netsim-junos-00 OK STARTED</b>
 basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim list
 ncs-netsim list for  /home/basondole/nso/ncs-run/netsim
 
@@ -176,3 +176,110 @@ Connection to 127.0.0.1 closed.
 basondole@netbox:~/nso/ncs-run/netsim$
 </pre>
 
+### Bulk export of devices to the nso
+When we have multiple emulated devices we can easily export them to the nso easing the urden of addin the devices one by one 
+
+<pre>
+basondole@netbox:~/nso/ncs-run/netsim$ ncs-netsim ncs-xml-init > devices.xml
+/home/basondole/nso/nso-5.1.0.1/bin/ncs-netsim: line 895: xsltproc: <b>command not found</b>
+/home/basondole/nso/nso-5.1.0.1/bin/ncs-netsim: line 895: xsltproc: <b>command not found</b>
+/home/basondole/nso/nso-5.1.0.1/bin/ncs-netsim: line 895: xsltproc: <b>command not found</b>
+/home/basondole/nso/nso-5.1.0.1/bin/ncs-netsim: line 895: xsltproc: <b>command not found</b>
+basondole@netbox:~/nso/ncs-run/netsim$ ls
+<b>devices.xml</b>  netsim-ios-00  netsim-junos-00  netsim-nx-00  netsim-xr-00  README.netsim
+
+basondole@netbox:~/nso/ncs-run/netsim$ ncs_load -l -m devices.xml
+ncs_load: 690: maapi_apply_trans_flags(sock, tid, 0, aflags) failed: Unsatisfied must constraint (41): \
+/ncs:devices/device{netsim-ios-00}/device-type : <b>must configure one of: snmp, cli, generic, netconf</b>
+basondole@netbox:~/nso/ncs-run/netsim$
+</pre>
+
+To uderstand the error we have to check the contents of the created file `devices.xml`
+```
+basondole@netbox:~/nso/ncs-run/netsim$ less devices.xml
+<devices xmlns="http://tail-f.com/ns/ncs">
+   <device>
+     <name>netsim-ios-00</name>
+     <address>127.0.0.1</address>
+     <port>10022</port>
+     <ssh>
+       <host-key>
+         <algorithm>ssh-rsa</algorithm>
+         <key-data>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/23... basondole@netbox</key-data>
+       </host-key>
+     </ssh>
+     <state>
+       <admin-state>unlocked</admin-state>
+     </state>
+     <authgroup>default</authgroup>
+     <device-type>
+       <cli>
+
+       </cli>
+     </device-type>
+   </device>
+```
+
+We see the device-type is not defined. We therefore have to edit it manually. To get the device type you can add the device manully to the nso
+```
+basondole@netbox:~/nso/ncs-run/netsim$ ncs_cli -C
+basondole@ncs(config)# show configuration | exclude no
+devices device test
+ address   test
+ authgroup default
+ device-type cli ned-id cisco-nx-cli-3.0
+ device-type cli protocol ssh
+ config
+ !
+!
+basondole@ncs(config)# commit dry-run outformat xml
+result-xml {
+    local-node {
+        data <devices xmlns="http://tail-f.com/ns/ncs">
+               <device>
+                 <name>test</name>
+                 <address>test</address>
+                 <authgroup>default</authgroup>
+                 <device-type>
+                   <cli>
+                     <ned-id xmlns:cisco-nx-cli-3.0="http://tail-f.com/ns/ned-id/cisco-nx-cli-3.0">cisco-nx-cli-3.0:cisco-nx-cli-3.0</ned-id>
+                     <protocol>ssh</protocol>
+                   </cli>
+                 </device-type>
+               </device>
+             </devices>
+    }
+}
+basondole@ncs(config)# end
+Uncommitted changes found, commit them? [yes/no/CANCEL] no
+basondole@ncs# exit
+```
+
+We then copy the `device-type` and paste in the corresponding section in the `device.xml file`
+ `device.xml` then becomes
+
+```
+basondole@netbox:~/nso/ncs-run/netsim$ less devices.xml
+devices xmlns="http://tail-f.com/ns/ncs">
+   <device>
+     <name>netsim-ios-00</name>
+     <address>127.0.0.1</address>
+     <port>10022</port>
+     <ssh>
+       <host-key>
+         <algorithm>ssh-rsa</algorithm>
+         <key-data>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/23... basondole@netbox</key-data>
+       </host-key>
+     </ssh>
+     <state>
+       <admin-state>unlocked</admin-state>
+     </state>
+     <authgroup>default</authgroup>
+     <device-type>
+       <cli>
+         <ned-id xmlns:cisco-ios-cli-3.8="http://tail-f.com/ns/ned-id/cisco-ios-cli-3.8">cisco-ios-cli-3.8:cisco-ios-cli-3.8</ned-id>
+         <protocol>ssh</protocol>
+       </cli>
+     </device-type>
+   </device>
+ ```
